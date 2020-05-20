@@ -1,8 +1,6 @@
 package ru.ifmo.collections;
 
-import java.util.AbstractSet;
-import java.util.Comparator;
-
+import java.util.*;
 /**
  * Represents sorted set of unique values.
  * create() returns a SortedSet instance with natural ordering. (i.e. from smallest to largest in case of integer numbers)
@@ -16,21 +14,68 @@ import java.util.Comparator;
  *
  * @param <T> set contents type
  */
-public abstract class SortedSet<T> extends AbstractSet<T> {
-    // private final Map<???, ???> contents; TODO decide Map implementation and key/value types. "???" is used just as an example
+
+public  class SortedSet<T> extends AbstractSet<T> {
+    private static final Object EXISTS = new Object();
+    private final Map<T, Object> map;
+
+    private SortedSet(TreeMap<T, Object> treeMap) {
+        map = treeMap;
+    }
+
     public static <T> SortedSet<T> create() {
-        throw new UnsupportedOperationException(); // TODO implement
+        return new SortedSet<>(new TreeMap<>());
     }
 
     public static <T> SortedSet<T> from(Comparator<T> comparator) {
-        throw new UnsupportedOperationException(); // TODO implement
+        return new SortedSet<>(new TreeMap<>(comparator));
     }
 
-    public T[] getSorted() {
-        throw new UnsupportedOperationException(); // TODO implement
+    public List<T> getSorted() {
+        return new ArrayList<>(map.keySet());
     }
 
-    public T[] getReversed() {
-        throw new UnsupportedOperationException(); // TODO implement
+    public List<T> getReversed() {
+        List<T> reversedList = new ArrayList<>(map.keySet());
+        Collections.reverse(reversedList);
+        return reversedList;
+    }
+
+    @Override
+    public boolean add(T t) {
+        return map.put(t, EXISTS) == null;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends T> c) {
+        boolean isAllAdded = false;
+        for (T it : c) {
+            isAllAdded |= add(it);
+        }
+        return isAllAdded;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return map.remove(o, EXISTS);
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        boolean isAllRemoved = false;
+        for (Object it : c) {
+            isAllRemoved |= remove(it);
+        }
+        return isAllRemoved;
+    }
+
+    @Override
+    public Iterator iterator() {
+        return map.keySet().iterator();
+    }
+
+    @Override
+    public int size() {
+        return map.size();
     }
 }
